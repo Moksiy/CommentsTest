@@ -13,12 +13,16 @@ namespace CommentsTest.Controllers
 {
     public class ArticlesController : Controller
     {
-        private BlogContext db = new BlogContext();
+        //private readonly BlogContext db = new BlogContext();
+
+        CommentsRepository repo = new CommentsRepository();
 
         // GET: Articles
         public ActionResult Index()
         {
-            return View(db.Articles.ToList());
+            IEnumerable<Article> articles = repo.GetArticles();
+            //return View(db.Articles.ToList());
+            return View(articles);
         }
 
         // GET: Articles/Details/5
@@ -28,7 +32,7 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = db.Articles.Find(id);
+            Article article = new Article();//db.Articles.Find(id);
             if (article == null)
             {
                 return HttpNotFound();
@@ -51,8 +55,8 @@ namespace CommentsTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Articles.Add(article);
-                db.SaveChanges();
+                //db.Articles.Add(article);
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -66,7 +70,7 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = db.Articles.Find(id);
+            Article article = new Article();//db.Articles.Find(id);
             if (article == null)
             {
                 return HttpNotFound();
@@ -83,8 +87,8 @@ namespace CommentsTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(article).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(article).State = EntityState.Modified;
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(article);
@@ -97,7 +101,7 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = db.Articles.Find(id);
+            Article article = new Article();//db.Articles.Find(id);
             if (article == null)
             {
                 return HttpNotFound();
@@ -108,11 +112,11 @@ namespace CommentsTest.Controllers
         // POST: Articles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed()
         {
-            Article article = db.Articles.Find(id);
-            db.Articles.Remove(article);
-            db.SaveChanges();
+            //Article article = db.Articles.Find(id);
+            //db.Articles.Remove(article);
+            //db.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -120,9 +124,17 @@ namespace CommentsTest.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                //db.Dispose();
             }
             base.Dispose(disposing);
         }
+
+        private Article GetPost(int? id)
+        {
+            //TODO: Доделать проверку поста
+            return id.HasValue ? null : new Article() { ID = -1 };
+        }
+
+        
     }
 }

@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using CommentsTest.Models;
 
 namespace CommentsTest
 {
@@ -14,7 +15,8 @@ namespace CommentsTest
     {
         protected void Application_Start()
         {
-            Database.SetInitializer<BlogContext>(new BloglInitializer());
+            CommentsRepository repository = new CommentsRepository();
+            repository.Initialize();
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

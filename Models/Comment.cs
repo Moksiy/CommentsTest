@@ -18,7 +18,6 @@ namespace CommentsTest.Models
         public Nullable<int> ParentID { get; set; }
 
         public virtual User User { get; set; }
-        public virtual Comment ParentComment { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
     }
 }
