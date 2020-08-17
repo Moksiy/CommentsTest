@@ -23,6 +23,21 @@ namespace CommentsTest.Models
             return articles;
         }
 
+        public Article GetArticle(int? id)
+        {
+            Article article = new Article();
+            if (id == null)
+                return new Article { ID = -1 };
+            else
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    article = db.Query<Article>("SELECT * FROM Articles WHERE ID = " + id).FirstOrDefault();
+                }
+                return article;
+            }
+        }
+
         public List<Comment> GetComments(int articleId)
         {
             List<Comment> comments = new List<Comment>();
@@ -33,11 +48,11 @@ namespace CommentsTest.Models
             return comments;
         }
 
-        public Comment Add(Comment comment)
+        public Comment AddComment(Comment comment)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                var sqlQuery = "INSERT INTO Comments (Text, User, Article, ParentId) VALUES(@Text, @User, @Article, @ParentId); SELECT CAST(SCOPE_IDENTITY() as int)";
+                var sqlQuery = "INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(@Text, @UserID, @ArticleID, @ParentID)";
                 int? commentId = db.Query<int>(sqlQuery, comment).FirstOrDefault();
                 comment.ID = (int)commentId;
             }

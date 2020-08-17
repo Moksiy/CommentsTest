@@ -3,9 +3,21 @@
 
 @{
     ViewBag.Title = "Index";
+    bool isPreviousLinkVisible = ViewBag.IsPreviousLinkVisible ?? false;
+    bool isNextLinkVisible = ViewBag.IsNextLinkVisible ?? false;
 }
 
-@foreach(Article article in Model)
+@foreach (Article article in Model)
 {
-    @article.Title <br />
+    @PostHelper.Render(article, Html, false)
+}
+
+@if (isPreviousLinkVisible)
+{
+<a id="previousLink" href="@Href("~/Articles/Index/" + (ViewBag.PageNumber - 1))">◀️ Назад  </a>
+}
+
+@if (isNextLinkVisible)
+{
+<a id="nextLink" href="@Href("~/Articles/Index/" + (ViewBag.PageNumber + 1))">Далее ▶️</a>
 }

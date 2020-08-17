@@ -16,13 +16,21 @@ namespace CommentsTest.Controllers
         //private readonly BlogContext db = new BlogContext();
 
         CommentsRepository repo = new CommentsRepository();
+        private const int ArticlesPerPage = 2;
 
         // GET: Articles
-        public ActionResult Index()
+        public ActionResult Index(int? id)
         {
-            IEnumerable<Article> articles = repo.GetArticles();
-            //return View(db.Articles.ToList());
-            return View(articles);
+            int pageNumber = id ?? 0;
+            IEnumerable<Article> articles = repo.GetArticles()
+                .Skip(pageNumber * ArticlesPerPage)
+                .Take(ArticlesPerPage + 1);
+
+            ViewBag.IsPreviousLinkVisible = pageNumber > 0;
+            ViewBag.IsNextLinkVisible = articles.Count() > ArticlesPerPage;
+            ViewBag.PageNumber = pageNumber;
+
+            return View(articles.Take(ArticlesPerPage));
         }
 
         // GET: Articles/Details/5
@@ -32,12 +40,28 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = new Article();//db.Articles.Find(id);
+
+            Article article = repo.GetArticle(id);
+
             if (article == null)
             {
                 return HttpNotFound();
             }
             return View(article);
+        }
+
+        [ValidateInput(false)]
+        public ActionResult Comment(int id, string text)
+        {
+            Article article = repo.GetArticle(id);
+            Comment comment = new Comment();
+            comment.ArticleID = article.ID;
+            comment.Text = text;
+            comment.ParentID = null;
+            comment.UserID = 1;
+            comment.User = new User { Name = "TEST" };
+            repo.AddComment(comment);
+            return RedirectToAction("Details", new { id = id });
         }
 
         // GET: Articles/Create
@@ -46,9 +70,6 @@ namespace CommentsTest.Controllers
             return View();
         }
 
-        // POST: Articles/Create
-        // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. 
-        // Дополнительные сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Title,Text")] Article article)
@@ -78,9 +99,6 @@ namespace CommentsTest.Controllers
             return View(article);
         }
 
-        // POST: Articles/Edit/5
-        // Чтобы защититься от атак чрезмерной передачи данных, включите определенные свойства, для которых следует установить привязку. 
-        // Дополнительные сведения см. в статье https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ID,Title,Text")] Article article)
@@ -128,13 +146,5 @@ namespace CommentsTest.Controllers
             }
             base.Dispose(disposing);
         }
-
-        private Article GetPost(int? id)
-        {
-            //TODO: Доделать проверку поста
-            return id.HasValue ? null : new Article() { ID = -1 };
-        }
-
-        
     }
 }

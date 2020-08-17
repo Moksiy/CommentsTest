@@ -1,0 +1,59 @@
+﻿@using CommentsTest.Models;
+
+@helper Render(Article article, System.Web.Mvc.HtmlHelper html, bool showComments)
+{
+<div class="postTitle">
+    @if (!showComments)
+    {
+        <a href="@Href("~/Articles/Details/" + article.ID)">@article.Title</a>
+    }
+    else
+    {
+        <p>@article.Title</p>
+    }
+</div>
+    <div class="postContainer">
+        <div class="postTabs">
+        </div>
+        <div class="postContent">
+            <div class="postBody">@html.Raw(article.Text)</div>
+        </div>
+        <div class="commentsTab">
+            @if (!showComments)
+            {
+                <a href="@Href("~/Articles/Details/" + article.ID + "#comments")">Commentы</a>
+            }
+        </div>
+    </div>
+
+    if (showComments)
+    {
+        <div id="commentContainer">
+            <a id="comments"></a>
+            @if (article.Comments != null)
+            {
+                foreach (Comment comment in article.Comments)
+                {
+                    <div class="comment">
+                        <div class="commentName">
+                            @comment.User.Name
+                        </div>
+                        :
+                        <div class="commentBody">
+                            @Html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
+                        </div>
+                    </div>
+                }
+            }
+
+            <div id="commentEditor">
+                <div id="commentPrompt">Оставить комментарий</div>
+                <form action="@Href("~/Articles/Comment/" + article.ID)" method="post">
+                    <input type="text" id="commentNamePrompt" name="name" />Имя (обязательно)<br />
+                    <textarea id="commentBodyInput" name="text" rows="10" cols="60"></textarea><br />
+                    <input type="submit" id="commentSubmitInput" name="submit" value="Submit!" />
+                </form>
+            </div>
+        </div>
+    }
+}
