@@ -196,7 +196,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\BlogDB.mdf" />
+    <EmbeddedResource Include="App_Data\BlogDB.mdf" />
     <Content Include="App_Data\BlogDB_log.ldf">
       <DependentUpon>BlogDB.mdf</DependentUpon>
     </Content>
