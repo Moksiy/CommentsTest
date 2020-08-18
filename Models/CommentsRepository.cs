@@ -70,8 +70,9 @@ namespace CommentsTest.Models
                 db.Query<Comment, Article, User, Comment>(@"
                     SELECT c.ID, c.[Text], c.ParentID, c.UserID, c.ArticleID, a.ID, a.Title, a.[Text], u.ID, u.Name FROM Comments c 
                     INNER JOIN Users u ON u.ID = c.UserID 
-                    INNER JOIN Articles a ON a.ID = c.ArticleID
-                ", (comment, article, user) =>
+                    INNER JOIN Articles a ON a.ID = c.ArticleID 
+                    WHERE c.ArticleID = 
+                " + articleId.ToString(), (comment, article, user) =>
                     {
                     var current = comment;
                         if(!comments.TryGetValue(comment.ID.ToString(), out current))

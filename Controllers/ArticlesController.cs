@@ -58,7 +58,7 @@ namespace CommentsTest.Controllers
                 Article = article,
                 Text = text,
                 Parent = new Comment { },
-                User = repo.GetUser(541)
+                User = repo.GetUser(559)
             };
             repo.AddComment(comment);
             return RedirectToAction("Details", new { id });
