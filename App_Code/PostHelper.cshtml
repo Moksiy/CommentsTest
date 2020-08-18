@@ -2,16 +2,16 @@
 
 @helper Render(Article article, System.Web.Mvc.HtmlHelper html, bool showComments)
 {
-<div class="postTitle">
-    @if (!showComments)
-    {
-        <a href="@Href("~/Articles/Details/" + article.ID)">@article.Title</a>
-    }
-    else
-    {
-        <p>@article.Title</p>
-    }
-</div>
+    <div class="postTitle">
+        @if (!showComments)
+        {
+            <a href="@Href("~/Articles/Details/" + article.ID)">@article.Title</a>
+        }
+        else
+        {
+            <p>@article.Title</p>
+        }
+    </div>
     <div class="postContainer">
         <div class="postTabs">
         </div>
@@ -21,7 +21,7 @@
         <div class="commentsTab">
             @if (!showComments)
             {
-                <a href="@Href("~/Articles/Details/" + article.ID + "#comments")">Commentы</a>
+                <a href="@Href("~/Articles/Details/" + article.ID + "#comments")">Комментариев: @article.Comments.Count</a>
             }
         </div>
     </div>
@@ -35,12 +35,17 @@
                 foreach (Comment comment in article.Comments)
                 {
                     <div class="comment">
-                        <div class="commentName">
-                            @comment.User.Name
-                        </div>
+                        @if (comment.User != null)
+                        {
+                            <div class="commentName"> @comment.User.Name</div>
+                        }
+                        else
+                        {
+                            <div class="commentName">@comment.User.ID</div>
+                        }
                         :
                         <div class="commentBody">
-                            @Html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
+                            @html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
                         </div>
                     </div>
                 }

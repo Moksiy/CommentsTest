@@ -19,44 +19,99 @@ namespace CommentsTest.Models
             using (IDbConnection db = new SqlConnection(connectionString))
             {
                 articles = db.Query<Article>("SELECT * FROM Articles").ToList();
+
+                foreach (var article in articles)
+                    article.Comments = GetComments(article.ID).ToList();
             }
             return articles;
-        }
-
-        public Article GetArticle(int? id)
-        {
-            Article article = new Article();
-            if (id == null)
-                return new Article { ID = -1 };
-            else
-            {
-                using (IDbConnection db = new SqlConnection(connectionString))
-                {
-                    article = db.Query<Article>("SELECT * FROM Articles WHERE ID = " + id).FirstOrDefault();
-                }
-                return article;
-            }
-        }
-
-        public List<Comment> GetComments(int articleId)
-        {
-            List<Comment> comments = new List<Comment>();
+            /*var sql = @"SELECT * FROM Articles a 
+                      INNER JOIN Comments c on c.ArticleID = a.ID
+                      INNER JOIN Users u on u.ID = c.UserID";
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                comments = db.Query<Comment>("SELECT * FROM Comment WHERE Article = @articleId", new { articleId }).ToList();
+                var data = db.Query<Article, Comment, User>(sql, (a, c) =>
+                 {
+                     c.User = u;
+                     a.Comments = c;
+                     return a;
+                 });
+
+                return data.ToList<Article>();
+            }*/
+        }
+
+        public Article GetArticle(int id)
+        {
+            Article article = new Article();
+
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                article = db.Query<Article>("SELECT * FROM Articles WHERE ID = " + id).FirstOrDefault();
+                article.Comments = GetComments(id).ToList();
             }
-            return comments;
+            return article;
+        }
+
+        public IEnumerable<Comment> GetComments(int articleId)
+        {
+            /*List<Comment> comments = new List<Comment>();
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                comments = db.Query<Comment>("SELECT * FROM Comments WHERE ArticleID = @articleId", new { articleId }).ToList();
+
+                foreach (var comment in comments)
+                    comment.User = db.Query<User>("SELECT * FROM Users WHERE ID = " + comment.User.ID).FirstOrDefault();
+            }
+            return comments;*/
+
+            var comments = new Dictionary<string, Comment>();
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                db.Query<Comment, Article, User, Comment>(@"
+                    SELECT c.ID, c.[Text], c.ParentID, c.UserID, c.ArticleID, a.ID, a.Title, a.[Text], u.ID, u.Name FROM Comments c 
+                    INNER JOIN Users u ON u.ID = c.UserID 
+                    INNER JOIN Articles a ON a.ID = c.ArticleID
+                ", (comment, article, user) =>
+                    {
+                    var current = comment;
+                        if(!comments.TryGetValue(comment.ID.ToString(), out current))
+                        {
+                            current = comment;
+                            comments.Add(current.ID.ToString(), current);
+                        }
+                        current.Article = article;
+                        current.User = user;
+
+                        return current;
+                }, splitOn:"ID, ID, ID");
+                return comments.Values;
+            }
         }
 
         public Comment AddComment(Comment comment)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                var sqlQuery = "INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(@Text, @UserID, @ArticleID, @ParentID)";
+                string sqlQuery = @"INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES('" + comment.Text + "', " + comment.User.ID + ", " + comment.Article.ID + ", NULL)";
                 int? commentId = db.Query<int>(sqlQuery, comment).FirstOrDefault();
                 comment.ID = (int)commentId;
             }
             return comment;
+        }
+
+        public User GetUser(int? id)
+        {
+            User user = new User();
+            if (id == null)
+                return new User { Name = "Пользователь" };
+            else
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    user = db.Query<User>("SELECT * FROM Users WHERE ID = " + id).FirstOrDefault();
+                }
+                return user;
+            }
         }
 
         public void Initialize()

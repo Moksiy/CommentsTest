@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -15,7 +14,7 @@ namespace CommentsTest.Controllers
     {
         //private readonly BlogContext db = new BlogContext();
 
-        CommentsRepository repo = new CommentsRepository();
+        readonly CommentsRepository repo = new CommentsRepository();
         private const int ArticlesPerPage = 2;
 
         // GET: Articles
@@ -41,7 +40,7 @@ namespace CommentsTest.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Article article = repo.GetArticle(id);
+            Article article = repo.GetArticle((int)id);
 
             if (article == null)
             {
@@ -51,17 +50,18 @@ namespace CommentsTest.Controllers
         }
 
         [ValidateInput(false)]
-        public ActionResult Comment(int id, string text)
+        public ActionResult Comment(int id, string text, string name)
         {
             Article article = repo.GetArticle(id);
-            Comment comment = new Comment();
-            comment.ArticleID = article.ID;
-            comment.Text = text;
-            comment.ParentID = null;
-            comment.UserID = 1;
-            comment.User = new User { Name = "TEST" };
+            Comment comment = new Comment
+            {
+                Article = article,
+                Text = text,
+                Parent = new Comment { },
+                User = repo.GetUser(541)
+            };
             repo.AddComment(comment);
-            return RedirectToAction("Details", new { id = id });
+            return RedirectToAction("Details", new { id });
         }
 
         // GET: Articles/Create
@@ -91,7 +91,7 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = new Article();//db.Articles.Find(id);
+            Article article = new Article();
             if (article == null)
             {
                 return HttpNotFound();
@@ -119,7 +119,7 @@ namespace CommentsTest.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Article article = new Article();//db.Articles.Find(id);
+            Article article = new Article();
             if (article == null)
             {
                 return HttpNotFound();
