@@ -1,9 +1,83 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 70px;
     padding-bottom: 20px;
+    margin: 0;
+    width: 100%;
+    color: #303030;
+    text-align: center;
+    font-family: Verdana, Tahoma, sans-serif;
+    font-size: 14px;
+    background-color:gainsboro;
 }
 
-/* Set padding to keep content from hitting the edges */
+#header{
+    padding: 10px;
+    color: #808080;
+}
+
+.postTitle{
+    margin: auto;
+    text-align: left;
+    width: 700px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Palatino Linotype';
+    padding-left: 85px;
+}
+
+.postContainer{
+    width: 700px;
+    margin: 0 auto 50px auto;
+}
+
+.postTabs{
+    color: #ffffff;
+    float: left;
+    font-size: 12px;
+}
+
+.commentsTab{
+    margin-top: 20px;
+    width: 160px;
+    padding: 5px;
+    background: #303030;
+}
+
+.postContent{
+    padding: 15px 15px 15px 50px;
+    width: 600px;
+    margin-left: 35px;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+
+.postBody{
+    text-align: left;
+    line-height: 1.5em;
+}
+
+.comment, #commentEditor{
+    text-align: left;
+    color: #000000;
+    background: #ffffff;
+    padding: 15px 15px 15px 50px;
+    margin-bottom: 30px;
+}
+
+#commentContainer{
+    width: 700px;
+    margin: auto;
+}
+
+.commentName{
+    font-style: italic;
+}
+
+.commentBody{
+    margin: 5px;
+}
+
 .body-content {
     padding-left: 15px;
     padding-right: 15px;

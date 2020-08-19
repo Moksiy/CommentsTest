@@ -50,7 +50,7 @@ namespace CommentsTest.Controllers
         }
 
         [ValidateInput(false)]
-        public ActionResult Comment(int id, string text, string name)
+        public ActionResult Comment(int id, string text)
         {
             Article article = repo.GetArticle(id);
             Comment comment = new Comment
@@ -58,10 +58,17 @@ namespace CommentsTest.Controllers
                 Article = article,
                 Text = text,
                 Parent = new Comment { },
-                User = repo.GetUser(559)
+                User = repo.GetUser(709)
             };
             repo.AddComment(comment);
             return RedirectToAction("Details", new { id });
+        }
+
+        public ActionResult Reply(int id)
+        {
+            Comment parentComment = repo.GetComment(id);
+
+            return null;
         }
 
         // GET: Articles/Create
