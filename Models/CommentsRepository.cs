@@ -74,8 +74,8 @@ namespace CommentsTest.Models
                     WHERE c.ArticleID = 
                 " + articleId.ToString(), (comment, article, user) =>
                     {
-                    var current = comment;
-                        if(!comments.TryGetValue(comment.ID.ToString(), out current))
+                        var current = comment;
+                        if (!comments.TryGetValue(comment.ID.ToString(), out current))
                         {
                             current = comment;
                             comments.Add(current.ID.ToString(), current);
@@ -84,7 +84,7 @@ namespace CommentsTest.Models
                         current.User = user;
 
                         return current;
-                }, splitOn:"ID, ID, ID");
+                    }, splitOn: "ID, ID, ID");
                 return comments.Values;
             }
         }
@@ -119,10 +119,26 @@ namespace CommentsTest.Models
             {
                 using (IDbConnection db = new SqlConnection(connectionString))
                 {
-                    user = db.Query<User>("SELECT * FROM Users WHERE ID = " + id).FirstOrDefault();                    
+                    user = db.Query<User>("SELECT * FROM Users WHERE ID = " + id).FirstOrDefault();
                 }
                 return user;
             }
+        }
+
+        public User CheckUser(string name)
+        {
+            User user = new User (){ Name = name};
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                user = db.Query<User>("SELECT ID FROM Users WHERE Name = N'" +name +"'").FirstOrDefault();
+                if(user == null)
+                {
+                    var sqlQuery = "INSERT INTO Users (Name) VALUES(N'"+name+"'); SELECT CAST(SCOPE_IDENTITY() as int)";
+                    int userId = db.Query<int>(sqlQuery, user).FirstOrDefault();
+                    return new User { ID = userId, Name = name };
+                }
+            }
+            return user;
         }
 
         public void Initialize()

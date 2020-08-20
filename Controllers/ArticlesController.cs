@@ -50,15 +50,17 @@ namespace CommentsTest.Controllers
         }
 
         [ValidateInput(false)]
-        public ActionResult Comment(int id, string text)
+        public ActionResult Comment(int id, string text, string name)
         {
             Article article = repo.GetArticle(id);
+            User user = repo.CheckUser(name);
+
             Comment comment = new Comment
             {
                 Article = article,
                 Text = text,
                 Parent = new Comment { },
-                User = repo.GetUser(709)
+                User = user
             };
             repo.AddComment(comment);
             return RedirectToAction("Details", new { id });
