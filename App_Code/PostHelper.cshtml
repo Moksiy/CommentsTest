@@ -44,7 +44,7 @@
                         }
                         else
                         {
-                            <div class="commentName">@comment.User.ID</div>
+                            <div class="commentName">Пользователь</div>
                         }
                         <div class="commentBody">
                             @html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
@@ -57,7 +57,7 @@
             <div id="commentEditor">
                 <div id="commentPrompt">Добавить комментарий</div>
                 <form action="@Href("~/Articles/Comment/" + article.ID)" method="post">
-                    <textarea id="commentBodyInput" name="text" rows="10" cols="60"></textarea><br />
+                    <textarea id="commentBodyInput" name="text" rows="2" cols="200"></textarea><br />
                     <input type="submit" id="commentSubmitInput" name="submit" value="Добавить" />
                 </form>
             </div>

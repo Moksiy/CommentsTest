@@ -119,7 +119,7 @@ namespace CommentsTest.Models
             {
                 using (IDbConnection db = new SqlConnection(connectionString))
                 {
-                    user = db.Query<User>("SELECT * FROM Users WHERE ID = " + id).FirstOrDefault();
+                    user = db.Query<User>("SELECT * FROM Users WHERE ID = " + id).FirstOrDefault();                    
                 }
                 return user;
             }
