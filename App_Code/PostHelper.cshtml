@@ -49,6 +49,7 @@
                             @html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
                         </div>
                         <a href="@Href("~/Articles/Reply/" + comment.ID)">Ответить</a>
+                        
                     </div>
                 }
             }
