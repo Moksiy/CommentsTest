@@ -21,23 +21,12 @@ namespace CommentsTest.Models
                 articles = db.Query<Article>("SELECT * FROM Articles").ToList();
 
                 foreach (var article in articles)
+                {
                     article.Comments = GetComments(article.ID).ToList();
+                }
+
             }
             return articles;
-            /*var sql = @"SELECT * FROM Articles a 
-                      INNER JOIN Comments c on c.ArticleID = a.ID
-                      INNER JOIN Users u on u.ID = c.UserID";
-            using (IDbConnection db = new SqlConnection(connectionString))
-            {
-                var data = db.Query<Article, Comment, User>(sql, (a, c) =>
-                 {
-                     c.User = u;
-                     a.Comments = c;
-                     return a;
-                 });
-
-                return data.ToList<Article>();
-            }*/
         }
 
         public Article GetArticle(int id)
@@ -59,22 +48,12 @@ namespace CommentsTest.Models
                 return db.Query<int>(@"SELECT        dbo.Articles.ID
                          FROM            dbo.Articles INNER JOIN
                          dbo.Comments ON dbo.Articles.ID = dbo.Comments.ArticleID
-						 WHERE Comments.ID = "+id).FirstOrDefault();
+						 WHERE Comments.ID = " + id).FirstOrDefault();
             }
         }
 
         public IEnumerable<Comment> GetComments(int articleId)
         {
-            /*List<Comment> comments = new List<Comment>();
-            using (IDbConnection db = new SqlConnection(connectionString))
-            {
-                comments = db.Query<Comment>("SELECT * FROM Comments WHERE ArticleID = @articleId", new { articleId }).ToList();
-
-                foreach (var comment in comments)
-                    comment.User = db.Query<User>("SELECT * FROM Users WHERE ID = " + comment.User.ID).FirstOrDefault();
-            }
-            return comments;*/
-
             var comments = new Dictionary<string, Comment>();
             using (IDbConnection db = new SqlConnection(connectionString))
             {
@@ -93,7 +72,6 @@ namespace CommentsTest.Models
                         }
                         current.Article = article;
                         current.User = user;
-
                         return current;
                     }, splitOn: "ID, ID, ID");
                 return comments.Values;
@@ -117,7 +95,7 @@ namespace CommentsTest.Models
                 string parent = "NULL";
                 if (comment.Parent != null)
                     parent = comment.Parent.ID.ToString();
-                string sqlQuery = @"INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(N'" + comment.Text + "', " + comment.User.ID + ", " + comment.Article.ID + ", "+parent+")";
+                string sqlQuery = @"INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(N'" + comment.Text + "', " + comment.User.ID + ", " + comment.Article.ID + ", " + parent + ")";
                 int? commentId = db.Query<int>(sqlQuery, comment).FirstOrDefault();
                 comment.ID = (int)commentId;
             }

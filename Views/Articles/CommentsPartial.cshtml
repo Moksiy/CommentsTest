@@ -1,10 +1,10 @@
 ﻿@model CommentsTest.Models.CommentsModel
 
-@if (Model.Comments.Where(x => x.Parent.ID == Model.Seed).Any())
+@if (true)
 {
-    foreach (var comment in Model.Comments)
+    foreach (var comment in Model.Article.Comments)
     {
-        if (comment.Parent.ID == Model.Seed)
+        if (true)
         {
             <div class="comment">
                 @if (comment.User != null)
@@ -21,6 +21,10 @@
                 @if (Model.ReplyComment != comment.ID)
                 {
                     <input type="submit" name="cancel" value="Ответить" />
+                    @helper helper()
+                    {
+
+                    }
                 }
                 else
                 {
@@ -38,8 +42,7 @@
                 @{
                     CommentsTest.Models.CommentsModel inner = new CommentsTest.Models.CommentsModel
                     {
-                        Seed = comment.ID,
-                        Comments = Model.Comments
+                        
                     };
                     Html.Partial("CommentsPartial", inner);
                 }
