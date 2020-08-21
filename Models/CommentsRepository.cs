@@ -57,12 +57,12 @@ namespace CommentsTest.Models
             var comments = new Dictionary<string, Comment>();
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                db.Query<Comment, Article, User, Comment>(@"
-                    SELECT c.ID, c.[Text], c.ParentID, c.UserID, c.ArticleID, a.ID, a.Title, a.[Text], u.ID, u.Name FROM Comments c 
+                db.Query<Comment, ParentComment, Article, User, Comment>(@"
+                    SELECT c.ID, c.[Text], c.ParentID, (SELECT Text FROM Comments WHERE ID = c.ParentID) as [Text], a.ID, a.Title, a.[Text], u.ID, u.Name FROM Comments c 
                     INNER JOIN Users u ON u.ID = c.UserID 
                     INNER JOIN Articles a ON a.ID = c.ArticleID 
                     WHERE c.ArticleID = 
-                " + articleId.ToString(), (comment, article, user) =>
+                " + articleId.ToString(), (comment, parentComment, article, user) =>
                     {
                         var current = comment;
                         if (!comments.TryGetValue(comment.ID.ToString(), out current))
@@ -72,8 +72,12 @@ namespace CommentsTest.Models
                         }
                         current.Article = article;
                         current.User = user;
+                        if (parentComment != null)
+                        {
+                            current.Parent = new Comment { ID = parentComment.ParentID, Text = parentComment.Text };
+                        }
                         return current;
-                    }, splitOn: "ID, ID, ID");
+                    }, splitOn: "ID, ParentID, ID, ID");
                 return comments.Values;
             }
         }
