@@ -9,7 +9,7 @@
 
 @foreach (Article article in Model)
 {
-    @PostHelper.Render(article, Html, false)
+    @PostHelper.Render(new CommentsModel { Article = article }, Html, false)
 }
 
 @if (isPreviousLinkVisible)

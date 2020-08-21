@@ -1,0 +1,50 @@
+﻿@model CommentsTest.Models.CommentsModel
+
+@if (Model.Comments.Where(x => x.Parent.ID == Model.Seed).Any())
+{
+    foreach (var comment in Model.Comments)
+    {
+        if (comment.Parent.ID == Model.Seed)
+        {
+            <div class="comment">
+                @if (comment.User != null)
+                {
+                    <div class="commentName"> @comment.User.Name :</div>
+                }
+                else
+                {
+                    <div class="commentName">Пользователь :</div>
+                }
+                <div class="commentBody">
+                    @Html.Raw(@Html.Encode(comment.Text).Replace("\n", "<br/>"))
+                </div>
+                @if (Model.ReplyComment != comment.ID)
+                {
+                    <input type="submit" name="cancel" value="Ответить" />
+                }
+                else
+                {
+                    <div id="commentEditor">
+                        <div id="commentPrompt">Ответить :</div>
+                        <form action="@Href("~/Articles/Reply/" + comment.ID)" method="post">
+                            <input type="text" id="commentNamePrompt" name="name" /> Имя (обязательно)<br />
+                            <textarea id="commentBodyInput" name="text" rows="2" cols="200"></textarea><br />
+                            <input type="submit" id="commentSubmitInput" name="submit" value="Добавить" />
+                            <input type="submit" name="cancel" value="Закрыть" />
+                        </form>
+                    </div>
+                }
+
+                @{
+                    CommentsTest.Models.CommentsModel inner = new CommentsTest.Models.CommentsModel
+                    {
+                        Seed = comment.ID,
+                        Comments = Model.Comments
+                    };
+                    Html.Partial("CommentsPartial", inner);
+                }
+
+            </div>
+        }
+    }
+}

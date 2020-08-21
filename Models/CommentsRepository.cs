@@ -52,6 +52,17 @@ namespace CommentsTest.Models
             return article;
         }
 
+        public int GetArticleID(int id)
+        {
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                return db.Query<int>(@"SELECT        dbo.Articles.ID
+                         FROM            dbo.Articles INNER JOIN
+                         dbo.Comments ON dbo.Articles.ID = dbo.Comments.ArticleID
+						 WHERE Comments.ID = "+id).FirstOrDefault();
+            }
+        }
+
         public IEnumerable<Comment> GetComments(int articleId)
         {
             /*List<Comment> comments = new List<Comment>();
@@ -103,7 +114,10 @@ namespace CommentsTest.Models
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                string sqlQuery = @"INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(N'" + comment.Text + "', " + comment.User.ID + ", " + comment.Article.ID + ", NULL)";
+                string parent = "NULL";
+                if (comment.Parent != null)
+                    parent = comment.Parent.ID.ToString();
+                string sqlQuery = @"INSERT INTO Comments (Text, UserID, ArticleID, ParentID) VALUES(N'" + comment.Text + "', " + comment.User.ID + ", " + comment.Article.ID + ", "+parent+")";
                 int? commentId = db.Query<int>(sqlQuery, comment).FirstOrDefault();
                 comment.ID = (int)commentId;
             }
@@ -127,13 +141,13 @@ namespace CommentsTest.Models
 
         public User CheckUser(string name)
         {
-            User user = new User (){ Name = name};
+            User user = new User() { Name = name };
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                user = db.Query<User>("SELECT ID FROM Users WHERE Name = N'" +name +"'").FirstOrDefault();
-                if(user == null)
+                user = db.Query<User>("SELECT ID FROM Users WHERE Name = N'" + name + "'").FirstOrDefault();
+                if (user == null)
                 {
-                    var sqlQuery = "INSERT INTO Users (Name) VALUES(N'"+name+"'); SELECT CAST(SCOPE_IDENTITY() as int)";
+                    var sqlQuery = "INSERT INTO Users (Name) VALUES(N'" + name + "'); SELECT CAST(SCOPE_IDENTITY() as int)";
                     int userId = db.Query<int>(sqlQuery, user).FirstOrDefault();
                     return new User { ID = userId, Name = name };
                 }

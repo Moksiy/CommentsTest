@@ -21,6 +21,7 @@ namespace CommentsTest.Controllers
         public ActionResult Index(int? id)
         {
             int pageNumber = id ?? 0;
+
             IEnumerable<Article> articles = repo.GetArticles()
                 .Skip(pageNumber * ArticlesPerPage)
                 .Take(ArticlesPerPage + 1);
@@ -40,13 +41,13 @@ namespace CommentsTest.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Article article = repo.GetArticle((int)id);
+            CommentsModel model = new CommentsModel() { Article = repo.GetArticle((int)id)};
 
-            if (article == null)
+            if (model.Article == null)
             {
                 return HttpNotFound();
             }
-            return View(article);
+            return View(model);
         }
 
         [ValidateInput(false)]
@@ -59,18 +60,42 @@ namespace CommentsTest.Controllers
             {
                 Article = article,
                 Text = text,
-                Parent = new Comment { },
+                Parent = null,
                 User = user
             };
             repo.AddComment(comment);
             return RedirectToAction("Details", new { id });
         }
 
-        public ActionResult Reply(int id)
+        [ValidateInput(false)]
+        public ActionResult ReplyComment(int id, string text, string name)
         {
+            int articleID = repo.GetArticleID(id);
+            Article article = repo.GetArticle(articleID);
+            User user = repo.CheckUser(name);
             Comment parentComment = repo.GetComment(id);
 
-            return null;
+            Comment comment = new Comment
+            {
+                Article = article,
+                Text = text,
+                Parent = parentComment,
+                User = user
+            };
+            repo.AddComment(comment);
+
+            id = articleID;
+
+            return RedirectToAction("Details", new { id });
+        }
+
+        public ActionResult Reply(int? id)
+        {
+            CommentsModel model = new CommentsModel() { Article = repo.GetArticle(repo.GetArticleID((int)id)) };
+
+            model.ReplyComment = id;
+
+            return View("Details", model);
         }
 
         // GET: Articles/Create
