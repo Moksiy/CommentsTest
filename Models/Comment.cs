@@ -12,5 +12,6 @@ namespace CommentsTest.Models
         public Comment Parent { get; set; }
         public User User { get; set; }
         public Article Article { get; set; }
+        public int Level { get; set; }
     }
 }

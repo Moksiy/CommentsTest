@@ -36,7 +36,7 @@
             {
                 foreach (Comment comment in article.Article.Comments.Where(x => x.Parent == null))
                 {
-                    <div class="comment">
+                    <div class="comment">                        
                         @if (comment.User != null)
                         {
                             <div class="commentName"> @comment.User.Name :</div>
@@ -51,7 +51,7 @@
 
                         @if (comment.ID != article.ReplyComment)
                         {
-                            <a href="@Href("~/Articles/Reply/" + comment.ID)">Ответить</a>                           
+                            <a href="@Href("~/Articles/Reply/" + comment.ID)">Ответить</a>
                         }
                         else
                         {
@@ -63,8 +63,8 @@
                                     <input type="submit" id="commentSubmitInput" name="submit" value="Добавить" />
                                 </form>
                             </div>
-                        }           
-                        
+                        }
+
                     </div>
                 }
             }

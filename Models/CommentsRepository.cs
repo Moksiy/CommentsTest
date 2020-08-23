@@ -55,6 +55,7 @@ namespace CommentsTest.Models
         public IEnumerable<Comment> GetComments(int articleId)
         {
             var comments = new Dictionary<string, Comment>();
+            var formatedComments = new Dictionary<string, Comment>();
             using (IDbConnection db = new SqlConnection(connectionString))
             {
                 db.Query<Comment, ParentComment, Article, User, Comment>(@"
@@ -78,6 +79,7 @@ namespace CommentsTest.Models
                         }
                         return current;
                     }, splitOn: "ID, ParentID, ID, ID");
+                
                 return comments.Values;
             }
         }
