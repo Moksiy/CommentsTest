@@ -55,15 +55,14 @@ namespace CommentsTest.Models
         public IEnumerable<Comment> GetComments(int articleId)
         {
             var comments = new Dictionary<string, Comment>();
-            var formatedComments = new Dictionary<string, Comment>();
+
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                db.Query<Comment, ParentComment, Article, User, Comment>(@"
-                    SELECT c.ID, c.[Text], c.ParentID, (SELECT Text FROM Comments WHERE ID = c.ParentID) as [Text], a.ID, a.Title, a.[Text], u.ID, u.Name FROM Comments c 
-                    INNER JOIN Users u ON u.ID = c.UserID 
-                    INNER JOIN Articles a ON a.ID = c.ArticleID 
-                    WHERE c.ArticleID = 
-                " + articleId.ToString(), (comment, parentComment, article, user) =>
+                List<int> parentCommentsID = db.Query<int>("SELECT ID FROM Comments WHERE ParentID IS NULL AND ArticleID =" + articleId).ToList();
+                foreach (var item in parentCommentsID)
+                {
+
+                    db.Query<Comment, ParentComment, Article, User, Comment>(@"EXEC GetFormatedComments " + item.ToString(), (comment, parentComment, article, user) =>
                     {
                         var current = comment;
                         if (!comments.TryGetValue(comment.ID.ToString(), out current))
@@ -79,9 +78,9 @@ namespace CommentsTest.Models
                         }
                         return current;
                     }, splitOn: "ID, ParentID, ID, ID");
-                
-                return comments.Values;
+                }
             }
+            return comments.Values;
         }
 
         public Comment GetComment(int id)

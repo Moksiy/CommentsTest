@@ -34,20 +34,21 @@
             <a id="comments"></a>
             @if (article.Article.Comments != null)
             {
-                foreach (Comment comment in article.Article.Comments.Where(x => x.Parent == null))
+                foreach (Comment comment in article.Article.Comments)
                 {
                     <div class="comment">                        
                         @if (comment.User != null)
                         {
-                            <div class="commentName"> @comment.User.Name :</div>
+                            <div class="commentName">@for (int i = 0; i < comment.Level; i++) { <a> &emsp;|&emsp; </a>} @comment.User.Name :</div>
                         }
                         else
                         {
                             <div class="commentName">Пользователь :</div>
                         }
-                        <div class="commentBody">
-                            @html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
-                        </div>
+                    <div class="commentBody">
+                        @for (int i = 0; i < comment.Level; i++)
+                        {<a> &emsp;&emsp; </a>} @html.Raw(@html.Encode(comment.Text).Replace("\n", "<br/>"))
+                    </div>
 
                         @if (comment.ID != article.ReplyComment)
                         {
