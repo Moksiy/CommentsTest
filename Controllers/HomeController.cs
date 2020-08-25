@@ -19,7 +19,10 @@ namespace CommentsTest.Controllers
 
             return View();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
