@@ -213,6 +213,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="App_Code\PostHelper.cshtml" />
+    <Content Include="SQL\sk.sql" />
     <Content Include="Views\Articles\CommentsPartial.cshtml" />
     <Content Include="App_Code\CommentsHelper.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />

@@ -8,6 +8,7 @@ namespace CommentsTest.Models
     public class CommentsModel
     {
         public Article Article { get; set; }
+
         public int? ReplyComment { get; set; }
     }
 }

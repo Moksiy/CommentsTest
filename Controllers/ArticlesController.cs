@@ -12,8 +12,6 @@ namespace CommentsTest.Controllers
 {
     public class ArticlesController : Controller
     {
-        //private readonly BlogContext db = new BlogContext();
-
         readonly CommentsRepository repo = new CommentsRepository();
         private const int ArticlesPerPage = 2;
 
@@ -53,6 +51,9 @@ namespace CommentsTest.Controllers
         [ValidateInput(false)]
         public ActionResult Comment(int id, string text, string name)
         {
+            if(String.IsNullOrWhiteSpace(text) || String.IsNullOrWhiteSpace(name))
+                return RedirectToAction("Details", new { id });
+
             Article article = repo.GetArticle(id);
             User user = repo.CheckUser(name);
 
@@ -70,6 +71,12 @@ namespace CommentsTest.Controllers
         [ValidateInput(false)]
         public ActionResult ReplyComment(int id, string text, string name)
         {
+            if (String.IsNullOrWhiteSpace(text) || String.IsNullOrWhiteSpace(name))
+            {
+                id = repo.GetArticleID(id);
+                return RedirectToAction("Details", new { id });
+            }
+
             int articleID = repo.GetArticleID(id);
             Article article = repo.GetArticle(articleID);
             User user = repo.CheckUser(name);
@@ -110,8 +117,6 @@ namespace CommentsTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                //db.Articles.Add(article);
-                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -139,8 +144,6 @@ namespace CommentsTest.Controllers
         {
             if (ModelState.IsValid)
             {
-                //db.Entry(article).State = EntityState.Modified;
-                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(article);
@@ -166,9 +169,6 @@ namespace CommentsTest.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed()
         {
-            //Article article = db.Articles.Find(id);
-            //db.Articles.Remove(article);
-            //db.SaveChanges();
             return RedirectToAction("Index");
         }
 

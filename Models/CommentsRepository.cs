@@ -13,6 +13,10 @@ namespace CommentsTest.Models
     {
         readonly string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
+        /// <summary>
+        /// Получаем список всех статей
+        /// </summary>
+        /// <returns></returns>
         public List<Article> GetArticles()
         {
             List<Article> articles = new List<Article>();
@@ -29,6 +33,11 @@ namespace CommentsTest.Models
             return articles;
         }
 
+        /// <summary>
+        /// Получаем статью по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public Article GetArticle(int id)
         {
             Article article = new Article();
@@ -41,17 +50,24 @@ namespace CommentsTest.Models
             return article;
         }
 
+        /// <summary>
+        /// Получаем id статьи
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public int GetArticleID(int id)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                return db.Query<int>(@"SELECT        dbo.Articles.ID
-                         FROM            dbo.Articles INNER JOIN
-                         dbo.Comments ON dbo.Articles.ID = dbo.Comments.ArticleID
-						 WHERE Comments.ID = " + id).FirstOrDefault();
+                return db.Query<int>(@"EXEC GetArticleID " + id).FirstOrDefault();
             }
         }
 
+        /// <summary>
+        /// Получаем список форматированный список комментов
+        /// </summary>
+        /// <param name="articleId"></param>
+        /// <returns></returns>
         public IEnumerable<Comment> GetComments(int articleId)
         {
             var comments = new Dictionary<string, Comment>();
@@ -83,6 +99,11 @@ namespace CommentsTest.Models
             return comments.Values;
         }
 
+        /// <summary>
+        /// Получаем конкретный коммент
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public Comment GetComment(int id)
         {
             var comment = new Comment();
@@ -93,6 +114,11 @@ namespace CommentsTest.Models
             return comment;
         }
 
+        /// <summary>
+        /// Добавляем новый коммент
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         public Comment AddComment(Comment comment)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
@@ -107,6 +133,11 @@ namespace CommentsTest.Models
             return comment;
         }
 
+        /// <summary>
+        /// Получаем пользователя по id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public User GetUser(int? id)
         {
             User user = new User();
@@ -122,6 +153,13 @@ namespace CommentsTest.Models
             }
         }
 
+        /// <summary>
+        /// Проверяем пользователя по имени
+        /// Если есть имя в бд, то возвращаем его id
+        /// Если нет такого - создаем запись и возвращаем id нового юзера
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public User CheckUser(string name)
         {
             User user = new User() { Name = name };
@@ -138,8 +176,12 @@ namespace CommentsTest.Models
             return user;
         }
 
+        /// <summary>
+        /// Заполнение бд тестовыми данным при каждом запуске
+        /// </summary>
         public void Initialize()
         {
+            #region
             using (IDbConnection db = new SqlConnection(connectionString))
             {
                 var sqlQuery = "DELETE FROM Articles " +
@@ -158,6 +200,7 @@ namespace CommentsTest.Models
                            "INSERT INTO Articles VALUES(N'Варшава. Главный город Польши за один день.', N'Варшава- это самый крупный город Польши, по совместительству столица. И столицей город является аж с конца XVI века, после того, как король Сигизмунд III перенес свою резиденцию из Вавельского замка в Кракове сюда. Численность населения составляет около 1,8 млн человек, а всей Польши 38,6 млн человек. В городе очень хорошо развит общественный транспорт, который работает круглосуточно. Метро, трамваи, автобусы и пригородные поезда, все в хорошем состоянии- чистое и ухоженное, как, наверное, и все в Польше. Составы в метро разные, есть и старого образца, а есть и нового. Трамваи мы видели только новые, возможно где-то ездят и старенькие. Почему пишу больше о метро и трамваях? Да потому, что они не зависят от пробок и, на мой взгляд, пользоваться ими удобней. Также Варшава является крупным европейским транспортным узлом, благодаря своему удобному расположению. Главным символом города является Варшавская русалочка - Сирена, ее изображение есть даже на гербе. И как вы уже могли догадаться, в старом городе установлен памятник в ее честь, а если быть точным, то целых два. Первый - XIX века, установлен на рыночной площади старого города, а второй находится на набережной реки Вислы, и создан он был в 1939 году. Картинка с сайта commons.m.wikimedia.org Картинка с сайта commons.m.wikimedia.org Вообще, весь старый город и основные достопримечательности расположились вдоль реки Вислы, как и у большинства старинных городов. Начать стоит с Дворцовой площади и после пойти в правую сторону (если стоять лицом к площади), как раз по направлению к реке. В самом центре площади стоит колонна Сигизмунда III, в восточной части площади расположился Королевский замок. А рядом с ним Кафедральный собор Святого Иоанна Крестителя (на польском Святого Яна), построенный в конце XIV века, и внесенный в список всемирного наследия ЮНЕСКО. Канония - небольшая улица в центре старого города, а вернее треугольная площадь. Свое название получила еще в далеком XVII веке благодаря тому, что в домах, расположенных по периметру этой площади жили каноники местного капитула. На этом месте располагалось кладбище еще до того, как были построены дома каноников. В центре площади красуется колокол, отлитый в XVII веке. Также в Старом городе находятся: Костел Иезуитов или Костел Милостивой Божьей Матери, Костел Святого Мартина, гнойная гора, памятник юному повстанцу и т.д. Да и вообще, сами детали Старого города очень красивы, будь то часы со знаками зодиака или просто фасады домов. Выходим из Старого города и попадаем к стенам Варшавского барбакана. Это полукруглый укреплённый передовой пост, одно из немногих укреплений сохранившихся с XVII века. Расположен он между новым и старым городом. Минуя его проходим в новый город. Здесь вашему вниманию представляются Костел Святого Яцека, Костел Святого Духа, Кастел Святого Казимира, Костел Посещения Пресвятой Девы Марии, Музей Марии Склодовской-Кюри, а также рынок Нового города. Поблизости расположен Мультимедийный парк фонтанов и если есть возможность, то сюда лучше приходить вечером. В период с мая по сентябрь по пятницам и субботам здесь проходят потрясающие мультимедийные шоу. К моему глубочайшему сожалению, мы на это шоу не попали, но все еще впереди! Вкратце о том что можно посмотреть в Варшаве. Удачных вам поездок! И вообще. Зачем я это копирую?')";
                 db.Execute(sqlQuery);
             }
+            #endregion
         }
     }
 }

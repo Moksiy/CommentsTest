@@ -12,6 +12,7 @@ namespace CommentsTest.Models
         public Comment Parent { get; set; }
         public User User { get; set; }
         public Article Article { get; set; }
+        //Уровень вложенности коммента 
         public int Level { get; set; }
     }
 }
