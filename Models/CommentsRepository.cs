@@ -74,27 +74,22 @@ namespace CommentsTest.Models
 
             using (IDbConnection db = new SqlConnection(connectionString))
             {
-                List<int> parentCommentsID = db.Query<int>("SELECT ID FROM Comments WHERE ParentID IS NULL AND ArticleID =" + articleId).ToList();
-                foreach (var item in parentCommentsID)
+                db.Query<Comment, ParentComment, Article, User, Comment>(@"EXEC GetFormatedComments " + articleId.ToString(), (comment, parentComment, article, user) =>
                 {
-
-                    db.Query<Comment, ParentComment, Article, User, Comment>(@"EXEC GetFormatedComments " + item.ToString(), (comment, parentComment, article, user) =>
+                    var current = comment;
+                    if (!comments.TryGetValue(comment.ID.ToString(), out current))
                     {
-                        var current = comment;
-                        if (!comments.TryGetValue(comment.ID.ToString(), out current))
-                        {
-                            current = comment;
-                            comments.Add(current.ID.ToString(), current);
-                        }
-                        current.Article = article;
-                        current.User = user;
-                        if (parentComment != null)
-                        {
-                            current.Parent = new Comment { ID = parentComment.ParentID, Text = parentComment.Text };
-                        }
-                        return current;
-                    }, splitOn: "ID, ParentID, ID, ID");
-                }
+                        current = comment;
+                        comments.Add(current.ID.ToString(), current);
+                    }
+                    current.Article = article;
+                    current.User = user;
+                    if (parentComment != null)
+                    {
+                        current.Parent = new Comment { ID = parentComment.ParentID, Text = parentComment.Text };
+                    }
+                    return current;
+                }, splitOn: "ID, ParentID, ID, ID");
             }
             return comments.Values;
         }
